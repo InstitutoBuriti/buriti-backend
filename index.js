@@ -9,8 +9,7 @@ require('dotenv').config();
 
 const db = require('./db');
 const app = express();
-const PORT = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET || 'seu-segredo-jwt';
+const PORT = process.env.PORT; // Usa apenas a porta fornecida pelo Render
 
 app.use(cors());
 app.use(express.json());
@@ -60,7 +59,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ error: 'Acesso não autorizado.' });
   }
 
-  jwt.verify(token, JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'seu-segredo-jwt', (err, user) => {
     if (err) {
       console.log('Erro ao verificar token:', err.message);
       return res.status(403).json({ error: 'Token inválido.' });
@@ -78,6 +77,11 @@ const authorizeAdmin = (req, res, next) => {
 // Rota de teste
 app.get('/api/ping', (req, res) => {
   res.json({ message: 'pong' });
+});
+
+// Rota raiz para redirecionar ou informar
+app.get('/', (req, res) => {
+  res.json({ message: 'Bem-vindo à API do Buriti Backend. Use /api/login para autenticação ou outras rotas como /api/cursos.' });
 });
 
 // Rota de login
@@ -108,7 +112,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nome: user.nome }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role, nome: user.nome }, process.env.JWT_SECRET || 'seu-segredo-jwt', { expiresIn: '1h' });
     const responseData = { token, user: { id: user.id, nome: user.nome, email: user.email, role: user.role } };
     console.log('Resposta a ser enviada:', responseData);
     res.json(responseData);
