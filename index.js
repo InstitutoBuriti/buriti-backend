@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const db = require('./db');
 const app = express();
-const PORT = process.env.PORT; // Usa apenas a porta fornecida pelo Render
+const PORT = process.env.PORT || 10000; // Usa a porta do Render ou 10000 como fallback
 
 app.use(cors());
 app.use(express.json());
